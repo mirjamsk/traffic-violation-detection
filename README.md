@@ -12,6 +12,7 @@ Say we are given 2 or 3 frames of a video: if the car that has priority has to s
 
 Moreover, in order to avoid complex computations when it comes to cross-roads, it is suggested to break the situation down to a combination of max 2 roads. Basically separate pairs of directions and judge from that
 
+--
 #### Hints:
 + check for matlab's d object detection and tracking libs
 + check the code from other students 
@@ -23,7 +24,6 @@ Moreover, in order to avoid complex computations when it comes to cross-roads, i
 
 #### Literature:
 First couple of chapters of [Multiple View Geometry in Computer Vision, by Richard Hartley and Andrew Zisserman](ftp://vista.eng.tau.ac.il/dropbox/aviad/Hartley,%20Zisserman%20-%20Multiple%20View%20Geometry%20in%20Computer%20Vision.pdf) 
-
 
 --
 
