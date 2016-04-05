@@ -1,0 +1,34 @@
+
+1) Funkcija tracking
+-----------------------------------------------------------------
+To je glavna funkcija u kojoj se pozivaju sve ostale funkcije, ispisuje se video itd.
+Na početku imaju neka dva hardkodirana parametra (moramo im odrediti značenje možda je bitno) i šalju to u funkciju load_parameters u kojoj definiraju parametre algoritma.
+Kada su definirali sve parametre za cijeli algoritam(znaci i za car detection i people detection i parametre za filtre) onda idu kreirati objekte u funkciji setupSystemObjects kojoj salju prethodno stvorene parametre gdje stvaraju objekte za citanje videa, detektiranje objekata koji se krecu i prikaz rezultata(tj. stvaraju objekte koje ce kasnije koristit u ovoj funkciji tracking da prikazu sve). Nakon toga imaju odredivanje zebre i crossinga(kutevi, duljina), al mislim da to nama nije korisno. Nakon toga zovu funkciju setup_road. Iduca je funkcija area_road_identification u kojoj 'oznacavaju cestu'. Nakon toga definiraju varijable koje će brojati aute i inicijaliziraju strukture to keep track of automobili, pjesaci i izbrisani automobili(moram skuzit jos sta im znace izbrisani automobili, valjda oni koji izadu iz frame-a). Kad je sve to gotovo ide se u while loop sve dok postoje video frame's za citanje - kad u matlabu citamo video, onda ga on ucita kao niz frameova, i tak prolazimo po videu.
+
+While loop: dok nije kraj videa do:
+pozovi funkciju detect_cars,detect_people
+
+
+2) Funkcija load_parameters
+------------------------------------------------------------------
+u ovoj funkciji definiraju do kraja parametre algoritma - znaci parametre za car detection, people detection(nama nepotrebno), 
+kalman parametre (to je neki filter). Oni su sve te parametre strpali u strukture i onda su sve te strukture strpali zajedno u jednu
+strukturu. Takoder na pocetku imaju switch za definiranje imena videa jer su ocito imali vise videa, ali zasto to moramo otkriti haha
+
+3) Funkcija setupSystemObjects
+------------------------------------------------------------------
+
+Funkcija koja dobiva strukturu sa svim inicijaliziranim parametrima. Ovdje stvaraju: objekt za citanje videa, video player i mask player(ovo
+jos moram skuzit sto radi tocno), objekt za ocitavanje registracija(ako sam ja to dobro skuzila) i za to im treba xml dokument i objekt za car detection.
+
+4) Funkcija setup_road
+------------------------------------------------------------------
+tu gledaju polozaj kamere prema zebri ili tako nesto i opet postavljaju parametre i systemObjects pomocu gornjih funkcija, al mi nije bas jasno zasto to rade dva puta ???
+
+5) Funkcija area_road_identification
+------------------------------------------------------------------
+Uzmu jedan okvir i oznace strane svijeta i prema poziciji zebre oznace u kojem je polozaju cesta, tj njezine koordinate
+
+6) Funkcija detect_cars
+------------------------------------------------------------------
+Prema poziciji zebre odreduju pozicije automobila, tj. gledaju gdje se nalazi zebra u videu i onda tocno detektiraju automobile koji bi mogli napraviti prekrsaj
