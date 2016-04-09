@@ -10,7 +10,7 @@ function car_tracks = predictNewLocationOfTracks(car_tracks)
 
         % Shift the bounding box so that its center is at
         % the predicted location.
-        predictedCentroid = int32(predictedCentroid) - bbox(3:4) / 2;
+        predictedCentroid = predictedCentroid - bbox(3:4) / 2;
         car_tracks(i).bbox = [predictedCentroid, bbox(3:4)];
         
     end

@@ -23,6 +23,7 @@ function [ centroids, bboxes, mask] = detectCars(system_object,frame)
     
     bboxes=[];
     centroids=[];
+    identified_boxes
     for k = 1:size(identified_boxes,1)
         bb = identified_boxes(k,:);
         xwidth = double(bb(3));
