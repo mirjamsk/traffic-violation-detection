@@ -1,4 +1,4 @@
-function [ centroids, bboxes, mask] = detectCars(system_object,frame)
+function [ centroids, bboxes, mask] = detectCars(system_object,frame,freehandMask)
 %The detectObjects function returns the centroids and the bounding boxes of 
 %the detected objects. It also returns the binary mask, 
 %which has the same size as the input frame. Pixels with a value of 1 correspond 
@@ -6,7 +6,8 @@ function [ centroids, bboxes, mask] = detectCars(system_object,frame)
 
     % Detect the foreground in the current video frame
     mask = system_object.detector.step(frame);
-    
+    mask(freehandMask==0) = 0;
+
     % Use morphological opening to remove noise in the foreground
     se = strel('square', 3);
     

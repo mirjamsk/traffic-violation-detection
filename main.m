@@ -2,7 +2,8 @@ clc
 clear 
 %%
 
-video = 'C:\\Users\\Lu\\Documents\\MATLAB\\IAProject\\video_data\\violation_non_violation_cut1.mp4';
+video = 'C:\\Users\\Lu\\Documents\\MATLAB\\IAProject\\video_data\\rooftop1_stabilized.avi';
+%video = 'video_data/rooftop1_stabilized.avi';
 
 % tu bi mogle parametre sredit
 

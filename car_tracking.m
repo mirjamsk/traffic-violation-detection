@@ -13,10 +13,15 @@ car_tracks = initializeCarTracks();
 nextID = 1;
 
 %% Detect moving objects and track them across video frames
+frame = system_object.reader.step(); % read frames
+freehandMask = freehand_mask(frame);
+% mogle bi saveat ovaj objekat i samo ga iscitat iz filea
+% save(video + '_mask',freehandMask)
+
 while ~isDone(system_object.reader)
     frame = system_object.reader.step(); % read frames
-    
-    [centroids, bounding_boxes, mask] = detectCars(system_object,frame);
+
+    [centroids, bounding_boxes, mask] = detectCars(system_object,frame, freehandMask);
     car_tracks = predictNewLocationOfTracks(car_tracks);
     
     [assignments, unassignedTracks, unassignedDetections] = ...
