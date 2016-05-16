@@ -1,4 +1,4 @@
-function car_tracking(video)
+function car_tracking(video, useFreehandMask)
 % detects cars, detects traffic violations
 %   Detailed explanation goes here
 
@@ -14,7 +14,11 @@ nextID = 1;
 
 %% Detect moving objects and track them across video frames
 frame = system_object.reader.step(); % read frames
-freehandMask = freehand_mask(frame);
+if useFreehandMask
+    freehandMask = freehand_mask(frame);
+else
+    freehandMask = ones(size(frame));
+end
 % mogle bi saveat ovaj objekat i samo ga iscitat iz filea
 % save(video + '_mask',freehandMask)
 

@@ -1,0 +1,1 @@
+video_data_sunday/*.mov filter=lfs diff=lfs merge=lfs -text
