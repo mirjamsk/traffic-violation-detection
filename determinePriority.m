@@ -1,21 +1,21 @@
-function priority = determinePriority(bbox)
+function priority = determinePriority(bbox, priorityBorder)
 
     % bbox(1,2) are the upper left corner coords
     % use the lower left corner
     car = bbox(1:2)+[1 bbox(4)];
-    borderPriority1 = [950, 650; 1720, 800];
-    borderPriority2 = [40,700; 950, 650];
-    borderPriority3 = [40,700; 1170, 950];
+    pb1 = priorityBorder.pb1;
+    pb2 = priorityBorder.pb2;
+    pb3 = priorityBorder.pb3;
     
-   if car(2) >= borderPriority3(1,2) && ...
-        isRightOfLine(borderPriority3(1,:), borderPriority3(2,:),car) 
+   if car(2) >= pb3(1,2) && ...
+        isRightOfLine(pb3(1,:), pb3(2,:),car) 
         priority = 3;
-    elseif  car(1) <= borderPriority2(2,1) && ...
-            car(2) <= borderPriority2(1,2) && ...
-        ~isRightOfLine(borderPriority2(1,:), borderPriority2(2,:),car)
+    elseif  car(1) <= pb2(2,1) && ...
+            car(2) <= pb2(1,2) && ...
+        ~isRightOfLine(pb2(1,:), pb2(2,:),car)
         priority = 2;
-    elseif car(1) > borderPriority1(1,1) && ...
-        ~isRightOfLine(borderPriority1(1,:), borderPriority1(2,:),car)
+    elseif car(1) > pb1(1,1) && ...
+        ~isRightOfLine(pb1(1,:), pb1(2,:),car)
         priority = 1;
     else
         priority = -1;

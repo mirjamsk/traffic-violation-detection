@@ -1,4 +1,4 @@
-function [ system_object ] = setupSystemObject(video)
+function [ system_object ] = setupSystemObject(video, params)
 % Function sets up all necessary system objects
 % Initializes video I/O, create objects for reading a video from a file, drawing the tracked
 % objects in each frame, and playing the video.
@@ -27,7 +27,7 @@ system_object.blobAnalyser = vision.BlobAnalysis( ...
     'CentroidOutputPort', true, ...
     'BoundingBoxOutputPort', true, ...
     'MinimumBlobArea', 4000, ...
-    'MaximumBlobArea', maximumBlobArea);
+    'MaximumBlobArea', params.maximumBlobArea);
 
 end
 
