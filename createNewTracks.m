@@ -9,7 +9,7 @@ function [car_tracks,nextID] = createNewTracks(centroids, bounding_boxes, unassi
 
             % Create a Kalman filter object.
             kalmanFilter = configureKalmanFilter('ConstantVelocity', ...
-                centroid, [200, 50], [1, 100], 100);
+                centroid, [200, 50], [1, 25], 100);
 
             % Create a new track.
             newTrack = struct(...
