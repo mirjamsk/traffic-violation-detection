@@ -3,7 +3,7 @@ function displayTrackingResults(frame, car_tracks, mask, system_object)
         frame = im2uint8(frame);
         mask = uint8(repmat(mask, [1, 1, 3])) .* 255;
 
-        minVisibleCount = 8;
+        minVisibleCount = 0;
         if ~isempty(car_tracks)
 
             % Noisy detections tend to result in short-lived tracks.
@@ -21,11 +21,15 @@ function displayTrackingResults(frame, car_tracks, mask, system_object)
 
                 % Get ids.
                 ids = int32([reliableTracks(:).id]);
+                priorities = int32([reliableTracks(:).priority]);
+                priorities = cellstr(int2str(priorities'));
+
 
                 % Create labels for objects indicating the ones for
                 % which we display the predicted rather than the actual
                 % location.
-                labels = cellstr(int2str(ids'));
+                ids = cellstr(int2str(ids'));
+                labels = strcat('id: ', ids, ' priority: ', priorities);
                 predictedTrackInds = ...
                     [reliableTracks(:).consecutiveInvisibleCount] > 0;
                 isPredicted = cell(size(labels));

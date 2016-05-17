@@ -30,7 +30,7 @@ function [ centroids, bboxes, mask] = detectCars(system_object,frame,freehandMas
         xwidth = double(bb(3));
         ywidth = double(bb(4));
         frac = xwidth/ywidth;
-        if frac >= 0.9 || xwidth*ywidth < 1e5 
+        if frac >= 0.9 
             centroids(k,:) = [(bb(1)+bb(3)/2) (bb(2)+bb(4)/2)];
             bboxes(k,:) = bb;
             
