@@ -5,8 +5,12 @@ function [ system_object ] = setupSystemObject(video)
 switch video
     case 'video_data_sunday/IMG_6914.mov'
         maximumBlobArea = 230000;
+    case 'video_data_sunday/IMG_6920.mov'
+        maximumBlobArea = 230000;
+    case 'video_data_sunday/IMG_5108.mov'
+        maximumBlobArea = 100000;
     otherwise
-        maximumBlobArea = 90000;
+        maximumBlobArea = 60000;
 end;
 
 system_object.reader = vision.VideoFileReader(video);

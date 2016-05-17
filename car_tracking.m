@@ -5,6 +5,7 @@ function car_tracking(video, useFreehandMask)
 % Create System objects used for reading video, detecting moving objects,
 % and displaying the results.
 system_object = setupSystemObject(video);
+reportedViolations = []; % list of car ids with priority 1 or 3 that were reported to violate the right hand rule
 
 %% Create an empty array of tracks 
 car_tracks = initializeCarTracks();
@@ -35,7 +36,9 @@ while ~isDone(system_object.reader)
     car_tracks = updateUnassignedTracks(car_tracks, unassignedTracks);
     car_tracks = deleteLostTracks(car_tracks);
     [car_tracks, nextID ] = createNewTracks(centroids, bounding_boxes, unassignedDetections, car_tracks, nextID);
-
+    car_tracks = updateVelocity(car_tracks);
+    reportedViolations = checkForViolations(car_tracks, reportedViolations);
+    
     displayTrackingResults(frame, car_tracks, mask, system_object);
 end
 
