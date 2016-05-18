@@ -1,6 +1,6 @@
-function params = loadParameters(videoId)
+function params = loadParameters(paramId)
 
-paramsCustom = strcat('setup_params/', videoId,'.mat');
+paramsCustom = strcat('setup_params/', paramId,'.mat');
 paramsDefault = 'setup_params/default_params.mat';
 try
     params = load(paramsCustom);
@@ -8,7 +8,7 @@ try
     
 catch
     params = load(paramsDefault);
-    fprintf('Could not load %s \nUsing %s instead', paramsCustom, paramsDefault);
+    fprintf('Could not load %s \nUsing %s instead\n', paramsCustom, paramsDefault);
 end
 
 end
