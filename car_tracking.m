@@ -17,12 +17,11 @@ nextID = 1;
 %% Detect moving objects and track them across video frames
 frame = system_object.reader.step(); % read frames
 if params.useFreehandMask
-    freehandMask = freehand_mask(frame);
+    %%freehandMask = freehand_mask(frame, getVideoId(video));
+    freehandMask = params.freehandMask;
 else
     freehandMask = ones(size(frame));
 end
-% mogle bi saveat ovaj objekat i samo ga iscitat iz filea
-% save(video + '_mask',freehandMask)
 
 while ~isDone(system_object.reader)
     frame = system_object.reader.step(); % read frames

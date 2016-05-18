@@ -1,4 +1,4 @@
-function binaryImage=freehand_mask(grayImage)
+function binaryImage=freehand_mask(grayImage, videoId)
 
 % Demo to have the user freehand draw an irregular shape over
 % a gray scale image, have it extract only that part to a new image,
@@ -6,8 +6,7 @@ function binaryImage=freehand_mask(grayImage)
 %
 % Change the current folder to the folder of this m-file.
     fontSize=11;
-
-    imshow(grayImage, []);
+    f = figure, imshow(grayImage, []);
     title('Original Grayscale Image', 'FontSize', fontSize);
     set(gcf, 'Position', get(0,'Screensize')); % Maximize figure.
     message = sprintf('Left click and hold to begin drawing.\nSimply lift the mouse button to finish');
@@ -44,5 +43,7 @@ function binaryImage=freehand_mask(grayImage)
     blackMaskedImage(~binaryImage) = 0;
     subplot(2, 3, 4);
     imshow(blackMaskedImage);
+    saveas(f,strcat('setup_params/freehandMask_', videoId,'.bmp'))
+    save(strcat('setup_params/freehandMask_', videoId,'.mat'),'binaryImage');
 
 end

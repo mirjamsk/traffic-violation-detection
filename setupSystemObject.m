@@ -2,16 +2,6 @@ function [ system_object ] = setupSystemObject(video, params)
 % Function sets up all necessary system objects
 % Initializes video I/O, create objects for reading a video from a file, drawing the tracked
 % objects in each frame, and playing the video.
-switch video
-    case 'video_data_sunday/IMG_6914.mov'
-        maximumBlobArea = 230000;
-    case 'video_data_sunday/IMG_6920.mov'
-        maximumBlobArea = 230000;
-    case 'video_data_sunday/IMG_5108.mov'
-        maximumBlobArea = 100000;
-    otherwise
-        maximumBlobArea = 60000;
-end;
 
 system_object.reader = vision.VideoFileReader(video);
 system_object.videoPlayer = vision.VideoPlayer('Position', [20, 400, 700, 400]);

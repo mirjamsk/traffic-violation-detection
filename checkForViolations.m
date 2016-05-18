@@ -22,8 +22,8 @@ for i = 1:length(cars_p2)
         if overlapRatio >=0.2 && cars_p1(j).velocity - cars_p2(i).velocity >= 250
             reportedViolations(end+1) = cars_p1(j).id;
             fprintf('Violation! overlap ratio between %d and %d = %.2f \n',cars_p2(i).id, cars_p1(j).id,  overlapRatio)
-            fprintf('%d. carsv= %.2f \n',cars_p2(i).id, cars_p2(i).velocity)
-            fprintf('%d. carsv= %.2f \n',cars_p1(j).id, cars_p1(j).velocity)
+            fprintf('%d. car''s v= %.2f \n',cars_p2(i).id, cars_p2(i).velocity)
+            fprintf('%d. car''s v= %.2f \n',cars_p1(j).id, cars_p1(j).velocity)
         end
     end
     

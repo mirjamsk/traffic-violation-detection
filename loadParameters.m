@@ -1,8 +1,6 @@
-function params = loadParameters(video)
+function params = loadParameters(videoId)
 
-videoId = strsplit(video, {'/','\','.'});
-videoId = videoId(end-1);
-paramsCustom = strcat('setup_params/', videoId{1},'.mat');
+paramsCustom = strcat('setup_params/', videoId,'.mat');
 paramsDefault = 'setup_params/default_params.mat';
 try
     params = load(paramsCustom);
