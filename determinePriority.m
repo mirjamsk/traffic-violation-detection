@@ -1,32 +1,24 @@
-function priority = determinePriority(bbox, priorityBorder)
+function priority = determinePriority(bbox, priorityPolygons)
 
     % bbox(1,2) are the upper left corner coords
     % use the lower left corner
-    car = bbox(1:2)+[1 bbox(4)];
-    pb1 = priorityBorder.pb1;
-    pb2 = priorityBorder.pb2;
-    pb3 = priorityBorder.pb3;
+    car = bbox(1:2);
+    carWidth = bbox(3);
+    carHeight = bbox(4);
     
-   if car(2) >= pb3(1,2) && ...
-        isRightOfLine(pb3(1,:), pb3(2,:),car) 
+    polyP1 = priorityPolygons.polyP1;
+    polyP2 = priorityPolygons.polyP2;
+    polyP3 = priorityPolygons.polyP3;
+    
+   if inpolygon(car(1)+carWidth, car(2)+carHeight, polyP3(:,1), polyP3(:,2))
         priority = 3;
-    elseif  car(1) <= pb2(2,1) && ...
-            car(2) <= pb2(1,2) && ...
-        ~isRightOfLine(pb2(1,:), pb2(2,:),car)
+    elseif  inpolygon(car(1)+carWidth, car(2)+carHeight, polyP2(:,1), polyP2(:,2))
         priority = 2;
-    elseif car(1) > pb1(1,1) && ...
-        ~isRightOfLine(pb1(1,:), pb1(2,:),car)
+    elseif inpolygon(car(1), car(2)+carHeight, polyP1(:,1), polyP1(:,2))
         priority = 1;
     else
         priority = -1;
     end
     
-    function res=isRightOfLine(a,b,p)
-        if (b(1) - a(1))*(p(2) - a(2)) - (b(2) - a(2))*(p(1) - a(1)) > 0;
-            res = true;
-        else
-            res = false;
-        end
-    end
 end
 

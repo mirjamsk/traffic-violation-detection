@@ -4,56 +4,52 @@ default_params =  loadParameters('default_params');
 custom_params = loadParameters(videoId);
 params = setstructfields(default_params, custom_params);
 
-priorityBorder = params.priorityBorder;
-pb1 = priorityBorder.pb1;
-pb2 = priorityBorder.pb2;
-pb3 = priorityBorder.pb3;
+priorityPolygons = params.priorityPolygons;
 
-figure('position', [0, 0, 1500, 1500])  % create new figure with specified size
+polyP1 = priorityPolygons.polyP1;
+polyP2 = priorityPolygons.polyP2;
+polyP3 = priorityPolygons.polyP3;
+
+colorP1 = [0.9 0.4 0.6];
+colorP2 = [0.3 0.8 0.5];
+colorP3 = [0.5 0.4 0.9];
+
+figure('position', [0, 0, 1920, 1080])  % create new figure with specified size
 
 title(strcat('Priority determination according for:  ', videoId), 'Interpreter', 'none');
 set(axes,'YDir','reverse'), hold on;
 
-line(pb1(:,1)',pb1(:,2)', 'Color','r', 'LineWidth',4), hold on;
-line(pb2(:,1)',pb2(:,2)', 'Color','g', 'LineWidth',4), hold on;
-line(pb3(:,1)',pb3(:,2)', 'Color','b', 'LineWidth',4), hold on;
+plot(polyP1(:,1), polyP1(:,2), 'Color', colorP1) % polygon
+plot(polyP2(:,1), polyP2(:,2), 'Color', colorP2) % polygon
+plot(polyP3(:,1), polyP3(:,2), 'Color', colorP3) % polygon
 
-for y=1:40:1080
-    for x=1:40:1920
-        priority = determinePriority([x,y, 0,0], priorityBorder);
-        marker = getMarkerStyle(priority);
-        plot(x, y, marker, 'MarkerSize', 5), hold on;
+for y=0:30:1080
+    for x=0:30:1920
+        priority = determinePriority([x,y, 0,0], priorityPolygons);
+        [markerSize, color] = getPriorityStyle(priority);
+        plot(x, y, 'Marker', '+', 'MarkerSize', markerSize,  'Color', color), hold on;
     end
 end
 
 legend({'Priority = 1','Priority = 2', 'Priority = 3'});
-showBorderCoords();
 hold off;
 
 % helper functions
 
-    function marker=getMarkerStyle(priority)
+    function [markerSize, color] = getPriorityStyle(priority)
+        markerSize = 5;
         switch priority
             case -1
-                marker = 'yo';
+                markerSize = 1;
+                color = [0.8 0.8 0.8];
             case 1
-                marker = 'ro';
+                color = colorP1;
             case 2
-                marker = 'go';
+                color = colorP2;
             case 3
-                marker = 'bo';
+                color = colorP3;
         end;
     end
 
-    function showBorderCoords()
-        pbs = struct2cell(priorityBorder);
-        for i = 1:numel(pbs)
-            pb = pbs{i};
-            str=strcat('(', num2str(pb, '%d, %d'),')');
-            text(pb(:,1),pb(:,2)-15,str, ...
-                'FontSize', 15,...
-                'BackgroundColor', 'w', ...
-                'VerticalAlignment', 'bottom');
-        end
-    end
+    
 end
