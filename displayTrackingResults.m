@@ -49,5 +49,7 @@ function displayTrackingResults(frame, car_tracks, mask, system_object)
         % Display the mask and the frame.
         system_object.maskPlayer.step(mask);
         system_object.videoPlayer.step(frame);
+        %imtool(frame);
+        %pause;
 
 end

@@ -7,7 +7,7 @@ function [ car_tracks ] = deleteLostTracks( car_tracks )
     end
     
     frame_x_width = 1920;
-    invisibleForTooLong = 20;
+    invisibleForTooLong = 40;
     ageThreshold = 8;
 
     % Compute the fraction of the track's age for which it was visible.

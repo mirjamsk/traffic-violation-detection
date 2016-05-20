@@ -37,9 +37,9 @@ while ~isDone(system_object.reader)
     car_tracks = deleteLostTracks(car_tracks);
     [car_tracks, nextID ] = createNewTracks(params, centroids, bounding_boxes, unassignedDetections, car_tracks, nextID);
     car_tracks = updateVelocity(car_tracks);
-    reportedViolations = checkForViolations(car_tracks, reportedViolations);
-    
     displayTrackingResults(frame, car_tracks, mask, system_object);
+    reportedViolations = checkForViolations(car_tracks, reportedViolations);
+   
 end
 
 end
