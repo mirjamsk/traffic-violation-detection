@@ -4,7 +4,7 @@ carsP1 = car_tracks([car_tracks(:).priority] == 1);
 carsP2 = car_tracks([car_tracks(:).priority] == 2);
 carsP3 = car_tracks([car_tracks(:).priority] == 3);
 
-if length(carsP1) + length(carsP1) == 0
+if length(carsP1) + length(carsP3) == 0
     return
 end
 for i = 1:length(carsP2)

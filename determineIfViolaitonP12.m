@@ -27,7 +27,7 @@ if  deltaX >= minDeltaDist
             deltaV = carP1.velocity - carP2.velocity;
             fprintf('%cv = %.2f \n', deltaChar, deltaV);
             if  deltaV < minDeltaVelocity
-                fprintf('Final call: Not a violation because %cv < %.2f \n', deltaChar, deltaV);
+                fprintf('Final call: Not a violation because %cv < %.2f \n', deltaChar, minDeltaVelocity);
             else
                 fprintf('Final call: Violation!\n');
             end
