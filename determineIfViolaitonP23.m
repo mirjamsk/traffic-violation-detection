@@ -11,7 +11,7 @@ if  deltaX >= minDeltaDist
     
     fprintf('------------------\n');
     fprintf('Attention!\n')
-    fprintf('Cars %d and %d ( priorities 2 and 1 respectively) just passed each other \n',carP2.id, carP3.id)
+    fprintf('Cars %d and %d ( priorities 2 and 3 respectively) just passed each other \n',carP2.id, carP3.id)
     fprintf('%cx = %.2f \n', deltaChar, deltaX);
     fprintf('%cy = %.2f \n', deltaChar, deltaY);
     
