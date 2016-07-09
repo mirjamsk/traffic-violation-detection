@@ -150,15 +150,14 @@ As we can see from Figure 1., first step in our algorithm consist of car recogni
 
 When we look at problems video surveillance could solve, we need to make sure the system is robust. To say the system of video surveillance is robust, it should not depend on correct position of the camera and it should not lose its performance when there are:
 
-\begin{enumerate}
-\item[•] objects that can be partially seen in the scene
-\item[•] overlapping objects in the scene
-\item[•] shadows
-\item[•] changes of lightning
-\item[•] objects that move slowly
-\item[•] objects that were visible and then removed from the scene
-
-\end{enumerate}
+\begin{itemize}
+\item objects that can be partially seen in the scene
+\item overlapping objects in the scene
+\item shadows
+\item changes of lightning
+\item objects that move slowly
+\item objects that were visible and then removed from the scene
+\end{itemize}
 
 Talking about recognizing of vehicles, the problem of their identification consists mostly of being able to keep good estimation of the foreground. After that, applying filters to foreground estimation will give us a foreground with more quality in which we can extract vehicles with \textit{blob analysis}.
 In the next few paragraphs we are going to explain all three steps in detail.
@@ -201,11 +200,147 @@ This assumes that the red, green, and blue pixel values are independent and have
 Thus, the distribution of recently observed values
 of each pixel in the scene is characterized by a mixture of Gaussians. A new pixel value will, in general, be represented by one of the major components of the mixture model and used to update the model. 
 
+Once we defined the model of the background, it is necessary to initialize diverse parameters of Gaussian mixtures. To avoid costly performance, Stauffer and Grimson [SG99] used K-means algorithm to initialize those parameters. Once we defined those parameters, it is possible to start the foreground estimation. To model this, we need
+a method for deciding what portion of the mixture
+model best represents background processes. First, the Gaussians are ordered by the value of
+${\omega/\sigma}$. This value increases both as a distribution gains more evidence and as the variance decreases. This ordering of the model is effectively an ordered list, where the most likely background distributions remain on top and the less probable transient background distributions gravitate towards the bottom and are eventually replaced by new distributions.
+
+The first $B$ distributions are chosen as background model, where:
+
+\begin{equation}
+B = argmin_{b}(\sum_{k=1}^{b}w_{k} > T)
+\end{equation}
+
+where $T$ is a measure of the minimum portion of the data that should be accounted for by the background. This takes the "best" distributions until a certain portion $T$, of the recent data has been accounted for. The other distributions are taken as foreground distributions. 
+Hence, when a new frame comes in time $t+1$, match test is being held on each pixel; one pixel belongs to a Gaussian distribution if a Mahalanobis (6) inequality is satisfied:
+
+\begin{equation}
+sqrt((X_{t+1}-\mu_{i,t})^T\sum_{i,t}^{-1}(X_{t+1}-\mu_{i,t})) < k\sigma_{i,t}
+\end{equation}
+
+where $k=2.5$.
+
+With the above equation there are two possible cases:
+
+\begin{enumerate}
+\item Pixel and one of $K$ Gaussian distributions were matched. In this case, a pixel is classified as a background pixel if its distribution is marked as a background distribution, or as a foreground pixel otherwise.
+\item If we did not find a distribution for a pixel, then the pixel is classified as a foreground pixel.
+\end{enumerate}
+
+The result of this procedure on every pixel is a binary matrix which has a value 1 denoting a foreground pixel and a value 0 denoting a background pixel. In Table 1 we can see parameters for foreground estimation used in our software.
+
+
+
+
+
+\begin{table}
+\begin{center}
+ \begin{tabular}{||c  c||} 
+ \hline
+ Name & Value \\ [0.5ex] 
+ \hline\hline
+ Num. Gaussians & 5  \\ 
+ \hline
+ Num. frames for learning & 50 \\
+ \hline
+ T & 0.005 \\
+ \hline
+ $\alpha$ & 0.2\\
+ \hline
+
+\end{tabular}
+\end{center}
+\caption{Table of parameters for foreground estimation}
+\label{table:1}
+\end{table}
+
+
+
 %------------------------------------------------
+\subsubsection{Filter application}
+
+Once we estimated the foreground, it was necessary to apply a filter to remove the noise. First we used function \textit{imopen} which performs morphological opening on the foreground estimation with a square structure element having dimensions $3\times3$. After that we used function \textit{imclose} which performs morphological closing on our estimated foreground. With function \textit{imfill} we performed hole filling on our foreground to get better precision.
+
+In Figure 2 we can see how the foreground looks like after the extraction and noise removal.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=10cm]{images/foreground.png}
+\caption{Extracted foreground with noise removed}
+\end{figure}
+
+\subsubsection{Blob analysis}
+
+After extracting the foreground and removing noise, we were ready to extract connected regions as blobs and identify which of the blobs correspond to vehicles. We performed blob analysis with MATLAB's BlobAnalysis. The output of blob analysis contains identified blobs which could correspond to vehicles. To remove possible outliers, we extracted width and hight of the blob and put a constraint over the ratio between the two, which had to be greater than 0.9. If the corresponding blob was detected as a car, we saved its bounding box and centroid.
+
+In Figure 3 we can see how the blobs are represented when processing the videos.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=10cm]{images/tracking.png}
+\caption{Detecting cars}
+\end{figure}
+
+\subsection{Tracking of vehicles}
+
+In order to be able to recognize traffic violations, after foreground detection and blob extraction, we had to be able to track moving vehicles through certain period of time. In this part of our software we were focused strictly on motion.
+
+The problem of motion-based object tracking can be divided into two parts:
+
+\begin{enumerate}
+\item detecting moving cars in each frame
+\item associating the detections corresponding to the same car object over time
+\end{enumerate}
+
+We described detection of moving cars in the previous subsection, where we used a foreground detection algorithm based on Gaussian mixture models, morphological operations to eliminate noise and blob analysis to detect groups of connected pixels, which represented moving vehicles.
+
+The association of detections to the same moving car (i.e track) is based solely on motion. Each track is representing a moving car in the video. The purpose of the structure is to maintain the state of a tracked car. The structure contains the following fields: 
+\begin{itemize}
+\item id: the integer ID of the track
+\item age: the number of frames since the track was first detected
+\item bbox: the current bounding box of the object; used for display
+\item bbox\_initial: first bounding box
+\item velocity: car's speed
+\item priority: car's priority; used for violation detection
+\item kalmanFilter: a Kalman filter object used for motion-based tracking
+\item totalVisibleCount: he total number of frames in which the track was detected (visible)
+\item consecutiveInvisibleCount : the number of consecutive frames for which the track was not detected (invisible).
+\end{itemize}
+
+The motion of each track is estimated by a Kalman filter. This filter is used to predict the track's location in each frame and determine the likelihood of each detection being assigned to each track.
+
+Track maintenance becomes an important aspect of this example. In any given frame, some detections may be assigned to tracks, while other detections and tracks may remain unassigned. The assigned tracks are updated using the corresponding detections. The unassigned tracks are marked invisible. An unassigned detection begins a new track.
+
+Each track keeps count of the number of consecutive frames, where it remained unassigned. If the count exceeds a specified threshold, the example assumes that the object left the field of view and it deletes the track.
+
+The part of our software which is in charge of tracking moving cars can be divided in several parts:
+
+\begin{itemize}
+\item detection of moving cars in the current frame
+\item prediction of new locations of existing tracks
+\item assignment of detections to tracks
+\item update of assigned tracks
+\item update of unassigned tracks
+\item deletion of lost tracks
+\item creation of new tracks
+\end{itemize}
+
+For \textit{predicition of new locations of existing tracks} we used Kalman filter. In this section, Kalman filter predicts the centroid of each track in the current frame and updates its bounding box accordingly. 
+
+\textit{Assignment of detections to tracks} is done by minimizing cost. The cost is defined as the negative log-likelihood of a detection corresponding to a track. This procedure involves two steps:
+\begin{enumerate}
+\item Compute the cost of assigning every detection to each track using the distance method of the vision.KalmanFilter system object. The cost takes into account the Euclidean distance between the predicted centroid of the track and the centroid of the detection. It also includes the confidence of the prediction, which is maintained by the Kalman filter. The results are stored in an $M\times N$ matrix, where M is the number of tracks, and N is the number of detections.
+
+\item Solve the assignment problem represented by the cost matrix using the \textit{assignDetectionsToTracks} function. The function takes the cost matrix and the cost of not assigning any detections to a track.
+\end{enumerate}
 
 
+The \textit{assignDetectionsToTracks} function uses the Munkres' version of the Hungarian algorithm to compute an assignment which minimizes the total cost.
 
+\textit{Update of assigned tracks} function updates each assigned track with the corresponding detection. It calls the \textit{correct} method of vision.KalmanFilter to correct the location estimate. Next, it stores the new bounding box, and increases the age of the track and the total visible count by 1. Finally, the function sets the invisible count to 0.
 
+Function \textit{update unassigned tracks} increases the age of invisible track by 1, so that the function {delete lost tracks} can delete tracks that were invisible for too many consecutive frames. It also deletes recently created tracks that have been invisible for too many frames overall.
+
+\subsection{Traffic violation recognition}
 
 %----------------------------------------------------------------------------------------
 %	MAJOR SECTION X - TEMPLATE - UNCOMMENT AND FILL IN
