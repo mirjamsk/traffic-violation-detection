@@ -118,11 +118,10 @@ Since we did not have a surveillance camera at our disposal, we used a classical
 This document serves to describe the structure of the software and its implementation in detail. Also, a detailed utility manual is given to describe software use-cases and to give a glimpse of situations in which software will work and some situations in which might fail.
 \\
 
-The report is divided into three sections:
+The report is divided into two sections:
 \begin{enumerate}
 \item Structure of the software and its implementation, in which we describe in detail approached used in development of our software;
-\item Manual, in which we describe possible use cases of the software;
-\item Conclusion, in which we give a critical review of our software and we list possible improvements of it. 
+\item Results, in which we give a critical review of our software and we list possible improvements of it. 
 \end{enumerate}
 
 %------------------------------------------------
@@ -134,12 +133,13 @@ The report is divided into three sections:
 
 \section{Structure of the software and its implementation} % Major section
 
-To get a software that recognizes traffic violations of a right hand rule, we had to divide the task in more subtasks to get the desired behaviour. Those subtasks can be seen in Figure 1.
+To get a software that recognizes traffic violations of a right hand rule, we had to divide the task in more subtasks to get the desired behaviour. Those subtasks can be seen in Figure \ref{fig:workflow}.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=10cm]{Drawing1.jpg}
-\caption{Software work flow}
+\caption{Software workflow}
+\label{fig:workflow}
 \end{figure}
 
 As we can see from Figure 1., first step in our algorithm consist of car recognition. In this step we had to extract background from the foreground and recognize cars in the given foreground. After extracting vehicles from the video footage, we had to track them through frames, so that we could determine their speed and direction. To identify if there is a violation of the right hand rule in the intersection, we divided the intersection in priorities and with the help of car's direction and speed determined if the violation occurred or not.
@@ -261,23 +261,25 @@ The result of this procedure on every pixel is a binary matrix which has a value
 
 Once we estimated the foreground, it was necessary to apply a filter to remove the noise. First we used function \textit{imopen} which performs morphological opening on the foreground estimation with a square structure element having dimensions $3\times3$. After that we used function \textit{imclose} which performs morphological closing on our estimated foreground. With function \textit{imfill} we performed hole filling on our foreground to get better precision.
 
-In Figure 2 we can see how the foreground looks like after the extraction and noise removal.
+In Figure \ref{fig:extr-fg} we can see how the foreground looks like after the extraction and noise removal.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=10cm]{images/foreground.png}
 \caption{Extracted foreground with noise removed}
+\label{fig:extr-fg}
 \end{figure}
 
 \subsubsection{Blob analysis}
 
 After extracting the foreground and removing noise, we were ready to extract connected regions as blobs and identify which of the blobs correspond to vehicles. We performed blob analysis with MATLAB's BlobAnalysis. The output of blob analysis contains identified blobs which could correspond to vehicles. To remove possible outliers, we extracted width and hight of the blob and put a constraint over the ratio between the two, which had to be greater than 0.9. If the corresponding blob was detected as a car, we saved its bounding box and centroid.
 
-In Figure 3 we can see how the blobs are represented when processing the videos.
+In Figure \ref{fig:car-detect} we can see how the blobs are represented when processing the videos.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=10cm]{images/tracking.png}
 \caption{Detecting cars}
+\label{fig:car-detect}
 \end{figure}
 
 \subsection{Tracking of vehicles}
@@ -340,31 +342,59 @@ The \textit{assignDetectionsToTracks} function uses the Munkres' version of the 
 
 Function \textit{update unassigned tracks} increases the age of invisible track by 1, so that the function {delete lost tracks} can delete tracks that were invisible for too many consecutive frames. It also deletes recently created tracks that have been invisible for too many frames overall.
 
+
 \subsection{Traffic violation recognition}
+The main goal is detection of the "right hand side" rule violation. When two vehicles find themselves in an intersection not governed by either a traffic light or a sign, then the rightmost vehicle as the priority of passage. The case when the other vehicle doesn't stop to let the rightmost pass is considered a violation of the \textit{rhs} rule. 
 
-%----------------------------------------------------------------------------------------
-%	MAJOR SECTION X - TEMPLATE - UNCOMMENT AND FILL IN
-%----------------------------------------------------------------------------------------
+First step in detecting violation is detecting moving cars and assigning them priorities. More specifically, rightmost cars have the highest priority of 3 and the rest are assigned priorities in descending order. 
+Detecting the priorities depends on the position of the camera. Having a still camera, we identified 3 possible roads each car could come from. This was done by 3 different polygon areas as shown in Figure \ref{fig:priorities}. In determining priorities, only the first frame in which the car has appeared determines its priority. For example, if the car's bounding box coordinates fall within the green polygon, it will be assigned priority 2. 
 
-%\section{Content Section}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{images/priority_detection.jpg}
+\caption{Detecting car's priority}
+\label{fig:priorities}
+\end{figure}
 
-%\subsection{Subsection 1} % Sub-section
+Having the system set up in this way, it's trivial to see that the only right-hand side rule violation could happen between cars of priority (1, 2) and  (2,3). 
+Next we track the cars and in each frame check for possible traffic violation between those the priority pairs. This is is done within functions \textit{determineIfViolaitonP12} and \textit{determineIfViolaitonP23}. In order for the program to decide if a violation between cars with priority 1 and 2 has happened these conditions need to be satisfied:
 
-% Content
+\begin{itemize}
+\item the distance between the left bounding box edge of vehicle with priority 2 and the one with priority 1 has to be greater than \textit{ minDeltaDist = 10}. Meaning we make sure the cars have passed each other
 
-%------------------------------------------------
+\item the distance between the top bounding box edge of vehicle with priority 1 and the one with priority 2 has to be greater than than \textit{ minDeltaDist = 10}. Meaning we make sure the car with priority 1 didn't make a left turn and is now "above" the car with priority 2
 
-%\subsection{Subsection 2} % Sub-section
+\item the overlap ratio of their bounding boxes has to be greater than \textit{ minOverlap = 0.2}.
+\item the difference between velocity \footnotemark of the vehicle with priority 2 and the one with lower priority has to be greater than  \textit{ minDeltaVelocity = 250}. 
+Meaning, the vehicle with the higher priority has to have a much lower velocity, as though it was stopping or slowing down
+\end{itemize}
+\footnotetext{The term velocity here is used somewhat loosely, because the true velocity could have been calculated only in case the actual intersection section dimensions were known, and if the center of the bounding box was less volatile. The calculation used for this velocity indicator can be found in the function \textit{updateVelocity}  }
 
-% Content
+\subsection{Manual}
+The videos on which we have tested our software can be fond in the \textit{video\_data\_sunday} folder. 
+The software can be run for any video by specifying its path with the \textit{videoPath} variable in the function \textit{main}.
+Running it runs the the traffic detection violation program which outputs its result in the console. 
 
 %----------------------------------------------------------------------------------------
 %	CONCLUSION
 %----------------------------------------------------------------------------------------
 
-\section{Conclusion} % Major section
+\section{Results} % Major section
+The results obtained after testing each video are the following:
+\begin{itemize}
+ \item  \textit{video\_data\_sunday/IMG\_5108.mov} the software correctly decides the first encounter of vehicles with priority 1,2 is not a violation due to their overlap ratio not being sufficiently large. Furthermore, it also correctly decides the second encounter was indeed a violation
+ \item  \textit{video\_data\_sunday/IMG\_6914.mov} an example of a car with priority 2 respecting the right-hand side rule, and stopping to let the car with priority 3 pass. The software correctly handles this situation 
+ \item  \textit{video\_data\_sunday/IMG\_6915\_01.mov} an example of traffic violation between two motorcycles with priority 1 and 3 which the software detects correctly 
+ \item  \textit{video\_data\_sunday/IMG\_6917.mov} in this video, the first car with priority 1 makes a left turn and the software correctly decides it is not a violation. But when a second car with priority 1 passes the car with priority 2 making it a violation, the bounding box unexpectedly "jumps" from the first to the second car, and they end up with each others priorities. As a result, the software doesn't detect the violation
+ \item  \textit{video\_data\_sunday/IMG\_6919.mov} An example of one non-violation between (1,2) and one violation between (1,2) which software correctly detects
+\end{itemize}
 
 
+Unfortunately, because of the conditions regarding video recording, we weren't able to procure a video where a violation of the right-hand side rule between vehicles with priority 2 and 3 had happened. Hence we were not fully able to test it for that particular instance.
+In addition, we feel obligated to point out that even the slightest shake of a camera can cause the surrounding background to be detected as a moving object, which consequentially renders the software useless in traffic violation detection. 
+Furthermore, all the videos we have tested are quite simple cases without much noise like pedestrians or too much traffic at the same time. In the future, it would be recommended to further refine motion detection so it also handles even more complex cases.
+
+\clearpage
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
