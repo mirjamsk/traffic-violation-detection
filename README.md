@@ -24,8 +24,3 @@ Moreover, in order to avoid complex computations when it comes to cross-roads, i
 
 #### Literature:
 First couple of chapters of [Multiple View Geometry in Computer Vision, by Richard Hartley and Andrew Zisserman](ftp://vista.eng.tau.ac.il/dropbox/aviad/Hartley,%20Zisserman%20-%20Multiple%20View%20Geometry%20in%20Computer%20Vision.pdf) 
-
---
-
-###### TO-DO:
-+ ask for example videos of both normal traffic and violations
